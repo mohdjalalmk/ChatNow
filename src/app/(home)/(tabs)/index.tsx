@@ -1,3 +1,4 @@
+import { useAuth } from "@/src/providers/AuthProvider";
 import { router } from "expo-router";
 import { useState } from "react";
 import { Text, View } from "react-native";
@@ -10,8 +11,14 @@ import {
 
 export default function ChatScreen() {
   const [channel, setChannel] = useState();
-  console.log(channel);
+  const { user } = useAuth();
 
-
-  return <ChannelList onSelect={(channel)=>{router.push(`/channel/${channel.cid}`)}} />;
+  return (
+    <ChannelList
+      filters={{ members: { $in: [user.id] } }}
+      onSelect={(channel) => {
+        router.push(`/channel/${channel.cid}`);
+      }}
+    />
+  );
 }
