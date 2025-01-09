@@ -5,6 +5,7 @@ import { StreamChat } from "stream-chat";
 import { Chat, OverlayProvider } from "stream-chat-expo";
 import { useAuth } from "./AuthProvider";
 import { supabase } from "../lib/superbase";
+import { TokenProvider } from "../utlis/TokenProvider";
 
 const client = StreamChat.getInstance(process.env.EXPO_PUBLIC_STREAM_API_KEY);
 
@@ -16,18 +17,22 @@ export const ChatProvider = ({ children }: PropsWithChildren) => {
       return;
     }
     const connect = async () => {
+      // const token = await TokenProvider()
+      //   console.log("token:",token)
+        
+  
       try {
-        const { data } = supabase.storage.from('avatars').getPublicUrl(profile.avatar_url)
+        // const { data } = supabrase.storage.from('avatars').getPublicUrl(profile.avatar_url)
 
-console.log(data.publicUrl)
+// console.log(data.publicUrl)
 
         const resp = await client.connectUser(
           {
             id: profile.id,
             name: profile.full_name,
-            image: data.publicUrl,
+            image: profile.publicUrl,
           },
-          client.devToken(profile.id)
+          TokenProvider
         );
         setIsReady(true);
       } catch (error) {
