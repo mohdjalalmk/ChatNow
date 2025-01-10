@@ -1,5 +1,5 @@
 import { useAuth } from "@/src/providers/AuthProvider";
-import { Link, router, Stack } from "expo-router";
+import { Link, Redirect, router, Stack } from "expo-router";
 import { useState } from "react";
 import { Text, View } from "react-native";
 import {
@@ -16,6 +16,7 @@ export default function ChatScreen() {
 
   return (
    <>
+   <Redirect href={'/(home)/call'}/>
    <Stack.Screen
         options={{
           headerRight: () => (
