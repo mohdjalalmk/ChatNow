@@ -32,7 +32,7 @@ const ChannelScreen = () => {
     return <LoadingIndicator />;
   }
   return (
-    <Channel channel={channel}>
+    <Channel audioRecordingEnabled={true} channel={channel}>
       <MessageList />
       <SafeAreaView edges={["bottom"]}>
         <MessageInput />
