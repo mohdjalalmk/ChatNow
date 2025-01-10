@@ -16,7 +16,7 @@ export default function ChatScreen() {
 
   return (
    <>
-   <Redirect href={'/(home)/call'}/>
+   {/* <Redirect href={'/(home)/call'}/> */}
    <Stack.Screen
         options={{
           headerRight: () => (
