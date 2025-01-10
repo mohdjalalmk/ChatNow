@@ -17,8 +17,10 @@ export const ChatProvider = ({ children }: PropsWithChildren) => {
       return;
     }
     const connect = async () => {
-      // const token = await TokenProvider()
-      //   console.log("token:",token)
+      console.log("profile id:",profile.id);
+      
+      const token = await TokenProvider()
+        console.log("token:",token)
         
   
       try {
