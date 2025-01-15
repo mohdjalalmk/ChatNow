@@ -39,6 +39,8 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         setProfile(null)
         return
     }
+    console.log("id:",session.user.id);
+    
     const fetchProfile = async()=>{
 
         let { data, error } = await supabase

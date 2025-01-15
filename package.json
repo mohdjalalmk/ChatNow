@@ -1,6 +1,6 @@
 {
   "name": "chatnow",
-  "main": "expo-router/entry",
+  "main": "./index.ts",
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
@@ -15,11 +15,14 @@
     "preset": "jest-expo"
   },
   "dependencies": {
+    "@config-plugins/react-native-callkeep": "^9.0.0",
     "@config-plugins/react-native-webrtc": "^10.0.0",
     "@expo/vector-icons": "^14.0.2",
-    "@op-engineering/op-sqlite": "^11.2.13",
+    "@notifee/react-native": "^9.1.8",
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-native-community/netinfo": "11.4.1",
+    "@react-native-firebase/app": "^21.6.2",
+    "@react-native-firebase/messaging": "^21.6.2",
     "@react-navigation/bottom-tabs": "^7.2.0",
     "@react-navigation/native": "^7.0.14",
     "@rneui/themed": "^4.0.0-rc.8",
@@ -38,6 +41,7 @@
     "expo-image-manipulator": "~13.0.5",
     "expo-image-picker": "~16.0.3",
     "expo-linking": "~7.0.3",
+    "expo-media-library": "~17.0.5",
     "expo-router": "~4.0.15",
     "expo-sharing": "~13.0.0",
     "expo-splash-screen": "~0.29.18",
@@ -48,15 +52,18 @@
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-native": "0.76.5",
+    "react-native-callkeep": "^4.3.16",
     "react-native-gesture-handler": "~2.20.2",
     "react-native-incall-manager": "^4.2.0",
     "react-native-reanimated": "~3.16.1",
     "react-native-safe-area-context": "4.12.0",
     "react-native-screens": "~4.4.0",
     "react-native-svg": "15.8.0",
+    "react-native-voip-push-notification": "^3.3.2",
     "react-native-web": "~0.19.13",
     "react-native-webview": "13.12.5",
-    "stream-chat-expo": "^6.1.0"
+    "stream-chat-expo": "^6.1.0",
+    "expo-notifications": "~0.29.12"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
