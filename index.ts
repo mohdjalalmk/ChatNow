@@ -67,9 +67,10 @@ messaging().setBackgroundMessageHandler(async (remoteMessage) => {
     ...((stream as unknown as Record<string, string> | undefined) ?? {}), // extract and merge stream object if present
   };
   const test = await notifee.displayNotification({
-    title: "New message from " + "jj",
-    body: "hhhhh",
-    data,
+    title: "New message from " + message?.message?.user?.name,  
+    body: message.message.text,
+data,
+
     android: {
       channelId,
       // add a press action to open the app on press

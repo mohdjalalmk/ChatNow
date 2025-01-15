@@ -5,6 +5,7 @@ import { Session } from '@supabase/supabase-js'
 import { supabase } from '@/src/lib/superbase'
 import { useAuth } from '@/src/providers/AuthProvider'
 import Avatar from '@/src/components/Avatar'
+import { useChatContext } from 'stream-chat-expo'
 
 export default function Account() {
   const {session} = useAuth()
@@ -13,6 +14,7 @@ export default function Account() {
   const [fullname, setFullname] = useState('')
   const [website, setWebsite] = useState('')
   const [avatarUrl, setAvatarUrl] = useState('')
+  const { client } = useChatContext();
 
   useEffect(() => {
     if (session) getProfile()
@@ -119,7 +121,10 @@ export default function Account() {
       </View>
 
       <View style={styles.verticallySpaced}>
-        <Button title="Sign Out" onPress={() => supabase.auth.signOut()} />
+        <Button title="Sign Out" onPress={async () =>{
+                await client.disconnectUser();
+
+          supabase.auth.signOut()}} />
       </View>
     </ScrollView>
   )

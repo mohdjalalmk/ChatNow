@@ -40,6 +40,7 @@ export default function Auth() {
       email: email,
       password: password,
     })
+console.log("session:",session);
 
     if (error) Alert.alert(error.message)
     if (!session) Alert.alert('Please check your inbox for email verification!')

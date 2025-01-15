@@ -11,18 +11,18 @@ import { Session, User } from "@supabase/supabase-js";
 type AuthContextType = {
   session: Session | null;
   user: User | null;
-  profile: any | null
+  profile: any | null;
 };
 
 const AuthContext = createContext<AuthContextType>({
   session: null,
   user: null,
-  profile:null
+  profile: null,
 });
 
 export const AuthProvider = ({ children }: PropsWithChildren) => {
   const [session, setSession] = useState<Session | null>(null);
-  const [profile,setProfile] = useState<any | null>()
+  const [profile, setProfile] = useState<any | null>();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -34,26 +34,26 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     });
   }, []);
 
-  useEffect(()=>{
-    if(!session?.user){
-        setProfile(null)
-        return
+  useEffect(() => {
+    if (!session?.user) {
+      setProfile(null);
+      return;
     }
-    console.log("id:",session.user.id);
-    
-    const fetchProfile = async()=>{
+    console.log("id:", session.user.id);
 
-        let { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id',session?.user?.id)
-        .single()   
-        setProfile(data)   
-    }
-    fetchProfile()
-  }),[session?.user]
+    const fetchProfile = async () => {
+      let { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", session?.user?.id)
+        .single();
+      setProfile(data);
+    };
+    fetchProfile();
+  }, [session?.user]);
+
   return (
-    <AuthContext.Provider value={{ session, user: session?.user,profile }}>
+    <AuthContext.Provider value={{ session, user: session?.user, profile }}>
       {children}
     </AuthContext.Provider>
   );

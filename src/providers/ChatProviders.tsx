@@ -33,7 +33,8 @@ export const ChatProvider = ({ children }: PropsWithChildren) => {
         );
         setIsReady(true);
       } catch (error) {
-        console.log("error:", error);
+        // setIsReady(false)
+        console.log("error in connect user:", error);
       }
 
       /**
