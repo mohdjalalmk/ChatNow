@@ -16,7 +16,8 @@ export default function Account() {
   const [website, setWebsite] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
   const { client } = useChatContext();
-  const {profile } = useAuth()
+  const { profile } = useAuth();
+  const { user } = useAuth();
 
   useEffect(() => {
     if (session) getProfile();
@@ -52,13 +53,9 @@ export default function Account() {
   }
 
   async function updateProfile({
-    username,
-    website,
     avatar_url,
     full_name,
   }: {
-    username: string;
-    website: string;
     avatar_url: string;
     full_name: string;
   }) {
@@ -68,9 +65,7 @@ export default function Account() {
 
       const updates = {
         id: session?.user.id,
-        username,
         full_name,
-        website,
         avatar_url,
         updated_at: new Date(),
       };
@@ -93,56 +88,62 @@ export default function Account() {
     <ScrollView style={styles.container}>
       <View style={{ alignItems: "center" }}>
         <Avatar
-          size={200}
           url={avatarUrl}
           onUpload={(url: string) => {
             setAvatarUrl(url);
             updateProfile({
-              username,
-              website,
               avatar_url: url,
               full_name: fullname,
             });
           }}
         />
       </View>
-      <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Input label="Email" value={session?.user?.email} disabled />
-      </View>
+      <View style={styles.horizontalLine}/>
+
       <View style={styles.verticallySpaced}>
+        <Input
+          label="Email"
+          value={session?.user?.email}
+          disabled
+          inputContainerStyle={styles.inputContainer}
+          inputStyle={styles.inputText}
+          labelStyle={styles.inputLabel}
+          disabledInputStyle={styles.disabledInput}
+        />
+      </View>
+      {/* <View style={styles.verticallySpaced}>
         <Input
           label="Username"
           value={username || ""}
           onChangeText={(text) => setUsername(text)}
         />
-      </View>
+      </View> */}
       <View style={styles.verticallySpaced}>
         <Input
           label="Fullname"
           value={fullname || ""}
           onChangeText={(text) => setFullname(text)}
-        />
-      </View>
-      <View style={styles.verticallySpaced}>
-        <Input
-          label="Website"
-          value={website || ""}
-          onChangeText={(text) => setWebsite(text)}
+          inputContainerStyle={styles.inputContainer}
+          inputStyle={styles.inputText}
+          labelStyle={styles.inputLabel}
+          placeholder="Enter your full name"
+          placeholderTextColor="#888"
         />
       </View>
 
-      <View style={[styles.verticallySpaced, styles.mt20]}>
+      <View style={styles.verticallySpaced}>
         <Button
           title={loading ? "Loading ..." : "Update"}
           onPress={() =>
             updateProfile({
-              username,
-              website,
               avatar_url: avatarUrl,
               full_name: fullname,
             })
           }
           disabled={loading}
+          buttonStyle={styles.updateButton}
+          titleStyle={styles.updateButtonText}
+          disabledStyle={styles.disabledButton}
         />
       </View>
 
@@ -151,43 +152,117 @@ export default function Account() {
           title="Sign Out"
           onPress={async () => {
             await client.disconnectUser();
-
             supabase.auth.signOut();
           }}
+          buttonStyle={styles.signOutButton}
+          titleStyle={styles.signOutButtonText}
         />
       </View>
-      <Text
-        onPress={async () => {
-const t= await tokenProvider()
-          const { data, error } = await supabase.functions.invoke('delete-user', {
-            method: 'DELETE', // Set method to DELETE for the function
-            headers: {
-              Authorization: `Bearer ${t}`, // Include the token in the Authorization header
-            },
-          });
-          console.log("profile:",profile.id);
-          
-          console.log("data:",data,"....error:",error,session?.user.id);
-          
-        }}
-      >
-        Delete account
-      </Text>
+      <View style={styles.verticallySpaced}>
+        <Button
+          title="Delete Account"
+          onPress={async () => {
+            if (!user) throw new Error("No user");
+            const resp = await supabase.functions.invoke("delete-account");
+            console.log("resp:", resp);
+            await client.disconnectUser();
+            supabase.auth.signOut();
+          }}
+          buttonStyle={styles.deleteButton}
+          titleStyle={styles.deleteButtonText}
+        />
+      </View>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 40,
     padding: 12,
   },
   verticallySpaced: {
-    paddingTop: 4,
     paddingBottom: 4,
     alignSelf: "stretch",
   },
-  mt20: {
-    marginTop: 20,
+  inputContainer: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 10,
+    backgroundColor: "#f9f9f9",
+    paddingHorizontal: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 2,
+  },
+  inputText: {
+    fontSize: 16,
+    color: "#333",
+  },
+  inputLabel: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#555",
+    marginBottom: 10,
+    marginLeft: 5,
+  },
+  disabledInput: {
+    color: "#aaa",
+    backgroundColor: "#eee",
+  },
+  updateButton: {
+    backgroundColor: "#008000",
+    borderRadius: 25,
+    paddingVertical: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  updateButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#fff",
+  },
+  disabledButton: {
+    backgroundColor: "#ddd",
+  },
+  horizontalLine: {
+    height: 1, // Thickness of the line
+    backgroundColor: "#ccc", // Line color
+    marginVertical: 15, // Space above and below the line,
+    marginHorizontal:15,
+  },
+  signOutButton: {
+    backgroundColor: "#36454F",
+    borderRadius: 25,
+    paddingVertical: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  signOutButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#fff",
+  },
+  deleteButton: {
+    backgroundColor: "#dc3545",
+    borderRadius: 25,
+    paddingVertical: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  deleteButtonText: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#fff",
   },
 });

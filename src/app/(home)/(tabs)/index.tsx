@@ -18,18 +18,6 @@ export default function ChatScreen() {
    <>
    {/* <Redirect href={'/(home)/call'}/> */}
    <Stack.Screen
-        options={{
-          headerRight: () => (
-            <Link href={'/(home)/UsersScreen'} asChild>
-              <FontAwesome5
-                name="users"
-                size={22}
-                color="gray"
-                style={{ marginHorizontal: 15 }}
-              />
-            </Link>
-          ),
-        }}
       />
       <ChannelList
         filters={{ members: { $in: [user.id] } }}
