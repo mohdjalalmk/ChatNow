@@ -216,6 +216,7 @@ export default function Account() {
 const styles = StyleSheet.create({
   container: {
     padding: 12,
+    marginBottom:120
   },
   lottie: {
     width: 200,
