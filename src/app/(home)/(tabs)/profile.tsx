@@ -7,6 +7,7 @@ import { useAuth } from "@/src/providers/AuthProvider";
 import Avatar from "@/src/components/Avatar";
 import { useChatContext } from "stream-chat-expo";
 import { tokenProvider } from "@/src/utlis/TokenProvider";
+import AnimatedLoader from "react-native-animated-loader";
 
 export default function Account() {
   const { session } = useAuth();
@@ -53,9 +54,13 @@ export default function Account() {
   }
 
   async function updateProfile({
+    username,
+    website,
     avatar_url,
     full_name,
   }: {
+    username: string;
+    website: string;
     avatar_url: string;
     full_name: string;
   }) {
@@ -65,8 +70,10 @@ export default function Account() {
 
       const updates = {
         id: session?.user.id,
-        full_name,
+        username,
+        website,
         avatar_url,
+        full_name,
         updated_at: new Date(),
       };
 
@@ -83,6 +90,18 @@ export default function Account() {
       setLoading(false);
     }
   }
+  const LoadingIndicator = () => {
+    return (
+      <AnimatedLoader
+        source={require("../../../../assets/animations/loading.json")}
+        visible={loading}
+        overlayColor="rgba(255,255,255,0.4)"
+        animationStyle={styles.lottie}
+        speed={2}
+        loop={true}
+      />
+    );
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -92,13 +111,15 @@ export default function Account() {
           onUpload={(url: string) => {
             setAvatarUrl(url);
             updateProfile({
+              username,
+              website,
               avatar_url: url,
               full_name: fullname,
             });
           }}
         />
       </View>
-      <View style={styles.horizontalLine}/>
+      <View style={styles.horizontalLine} />
 
       <View style={styles.verticallySpaced}>
         <Input
@@ -118,9 +139,23 @@ export default function Account() {
           onChangeText={(text) => setUsername(text)}
         />
       </View> */}
+      {LoadingIndicator()}
       <View style={styles.verticallySpaced}>
         <Input
-          label="Fullname"
+          label="User name"
+          value={username || ""}
+          onChangeText={(text) => setUsername(text)}
+          inputContainerStyle={styles.inputContainer}
+          inputStyle={styles.inputText}
+          labelStyle={styles.inputLabel}
+          placeholder="Enter your user name"
+          placeholderTextColor="#888"
+        />
+      </View>
+
+      <View style={styles.verticallySpaced}>
+        <Input
+          label="Full Name"
           value={fullname || ""}
           onChangeText={(text) => setFullname(text)}
           inputContainerStyle={styles.inputContainer}
@@ -136,6 +171,8 @@ export default function Account() {
           title={loading ? "Loading ..." : "Update"}
           onPress={() =>
             updateProfile({
+              username,
+              website,
               avatar_url: avatarUrl,
               full_name: fullname,
             })
@@ -179,6 +216,11 @@ export default function Account() {
 const styles = StyleSheet.create({
   container: {
     padding: 12,
+  },
+  lottie: {
+    width: 200,
+    height: 100,
+    color: "#008000",
   },
   verticallySpaced: {
     paddingBottom: 4,
@@ -233,7 +275,7 @@ const styles = StyleSheet.create({
     height: 1, // Thickness of the line
     backgroundColor: "#ccc", // Line color
     marginVertical: 15, // Space above and below the line,
-    marginHorizontal:15,
+    marginHorizontal: 15,
   },
   signOutButton: {
     backgroundColor: "#36454F",

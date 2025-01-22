@@ -119,7 +119,7 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
             <MaterialIcons
               onPress={uploadAvatar}
               name="add-a-photo"
-              size={24}
+              size={36}
               color="green"
             />
           </View>

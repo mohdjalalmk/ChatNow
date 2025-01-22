@@ -27,6 +27,8 @@ export default function Auth() {
       password: password,
     })
 
+    const jwtToken = data?.access_token;
+    console.log('JWT Token:', k);
     if (error) Alert.alert(error.message)
     setLoading(false)
   }

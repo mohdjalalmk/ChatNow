@@ -19,10 +19,10 @@ const ChannelScreen = () => {
 
   const { client } = useChatContext();
   const videoClient = useStreamVideoClient();
+  console.log("channel array2:", Object.values(channel?.state?.members));
 
   const fetchChannel = async () => {
     const channel = await client.queryChannels({ cid });
-    console.log("channel array:", channel);
 
     setChannel(channel[0]);
   };
@@ -62,6 +62,16 @@ const ChannelScreen = () => {
       <Stack.Screen
         options={{
           title: "Chat",
+          headerTitle:"test",
+          headerLeft:()=>{
+            return(
+              <>
+              <Text onPress={()=>{
+                router.back()
+              }}>back</Text>
+              </>
+            )
+          },
           headerRight: () => <Text onPress={startACall}>Call</Text>,
         }}
       />
