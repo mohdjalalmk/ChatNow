@@ -227,7 +227,7 @@ export default function Account() {
         cancelText="Cancel"
         onConfirm={handleSignOut}
         onCancel={() => setShowSignOutModal(false)}
-        logo={<FontAwesome name="sign-out" size={40} color="#36454F" />}
+        logo={<FontAwesome name="sign-out" size={40} color="#002244" />}
       />
 
       {/* Delete Account Modal */}
@@ -239,7 +239,7 @@ export default function Account() {
         cancelText="Cancel"
         onConfirm={handleDeleteAccount}
         onCancel={() => setShowDeleteAccountModal(false)}
-        logo={<AntDesign name="deleteuser" size={40} color="#36454F" />}
+        logo={<AntDesign name="deleteuser" size={40} color="#002244" />}
       />
     </ScrollView>
   );
@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 15,
   },
   signOutButton: {
-    backgroundColor: "#36454F",
+    backgroundColor: "#002244",
     borderRadius: 25,
     paddingVertical: 12,
     shadowColor: "#000",

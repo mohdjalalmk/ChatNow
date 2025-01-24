@@ -102,7 +102,7 @@ const ChannelScreen = () => {
   const EmptyStateIndicator = () => {
     return (
       <View style={styles.container}>
-        <Entypo name="chat" size={40} color="#36454F" />
+        <Entypo name="chat" size={40} color="#002244" />
         <Text style={styles.message}>
           No messages yet. Start a conversation!
         </Text>

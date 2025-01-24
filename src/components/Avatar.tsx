@@ -130,16 +130,16 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
           flexDirection: "row",
           justifyContent: "center",
           alignItems: "center",
-          marginTop:15
+          marginTop: 15,
         }}
       >
         {/* <Button
-          color={"#36454F"}
+          color={"#002244"}
           title={"Edit"}
           onPress={uploadAvatar}
           disabled={uploading}
         /> */}
-        <Text style={{marginRight:10,color:"36454F"}}>Edit</Text>
+        <Text style={{ marginRight: 10, color: "002244" }}>Edit</Text>
         <FontAwesome name="edit" size={24} color="#008000" />
       </Pressable>
     </View>

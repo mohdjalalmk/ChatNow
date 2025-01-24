@@ -8,6 +8,6 @@ const AuthLayout = () => {
     if(user){
         return <Redirect href={'/(home)'}/>
     }
-  return <Stack />;
+  return <Stack screenOptions={{headerShown:false}} />;
 };
 export default AuthLayout;

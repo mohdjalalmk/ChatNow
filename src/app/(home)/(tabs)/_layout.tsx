@@ -23,7 +23,7 @@ export default function TabsNavigator() {
             width: 70,
             height: 70,
             borderRadius: 35,
-            backgroundColor: "#36454F",
+            backgroundColor: "#002244",
             alignItems: "center",
             justifyContent: "center",
           }}
