@@ -112,7 +112,6 @@ const ChannelScreen = () => {
 
   return (
     <Channel
-      giphyEnabled={false}
       audioRecordingEnabled={true}
       channel={channel}
     >

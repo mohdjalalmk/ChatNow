@@ -132,6 +132,7 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
           alignItems: "center",
           marginTop: 15,
         }}
+        onPress={uploadAvatar}
       >
         {/* <Button
           color={"#002244"}
