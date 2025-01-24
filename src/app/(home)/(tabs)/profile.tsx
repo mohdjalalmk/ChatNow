@@ -8,6 +8,9 @@ import Avatar from "@/src/components/Avatar";
 import { useChatContext } from "stream-chat-expo";
 import { tokenProvider } from "@/src/utlis/TokenProvider";
 import AnimatedLoader from "react-native-animated-loader";
+import AlertBox from "@/src/components/AlerBox";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 export default function Account() {
   const { session } = useAuth();
@@ -16,6 +19,8 @@ export default function Account() {
   const [fullname, setFullname] = useState("");
   const [website, setWebsite] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
+  const [showSignOutModal, setShowSignOutModal] = useState(false);
+  const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
   const { client } = useChatContext();
   const { profile } = useAuth();
   const { user } = useAuth();
@@ -90,6 +95,20 @@ export default function Account() {
       setLoading(false);
     }
   }
+  const handleSignOut = async () => {
+    await client.disconnectUser();
+    supabase.auth.signOut();
+    setShowSignOutModal(false);
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!user) throw new Error("No user");
+    await supabase.functions.invoke("delete-account");
+    await client.disconnectUser();
+    supabase.auth.signOut();
+    setShowDeleteAccountModal(false);
+  };
+
   const LoadingIndicator = () => {
     return (
       <AnimatedLoader
@@ -187,10 +206,7 @@ export default function Account() {
       <View style={styles.verticallySpaced}>
         <Button
           title="Sign Out"
-          onPress={async () => {
-            await client.disconnectUser();
-            supabase.auth.signOut();
-          }}
+          onPress={() => setShowSignOutModal(true)}
           buttonStyle={styles.signOutButton}
           titleStyle={styles.signOutButtonText}
         />
@@ -198,17 +214,33 @@ export default function Account() {
       <View style={styles.verticallySpaced}>
         <Button
           title="Delete Account"
-          onPress={async () => {
-            if (!user) throw new Error("No user");
-            const resp = await supabase.functions.invoke("delete-account");
-            console.log("resp:", resp);
-            await client.disconnectUser();
-            supabase.auth.signOut();
-          }}
+          onPress={() => setShowDeleteAccountModal(true)}
           buttonStyle={styles.deleteButton}
           titleStyle={styles.deleteButtonText}
         />
       </View>
+      <AlertBox
+        visible={showSignOutModal}
+        title="Sign Out"
+        description="Are you sure you want to sign out? You will need to log back in to access your account."
+        confirmText="Sign Out"
+        cancelText="Cancel"
+        onConfirm={handleSignOut}
+        onCancel={() => setShowSignOutModal(false)}
+        logo={<FontAwesome name="sign-out" size={40} color="#36454F" />}
+      />
+
+      {/* Delete Account Modal */}
+      <AlertBox
+        visible={showDeleteAccountModal}
+        title="Delete Account"
+        description="Are you sure you want to delete your account? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={handleDeleteAccount}
+        onCancel={() => setShowDeleteAccountModal(false)}
+        logo={<AntDesign name="deleteuser" size={40} color="#36454F" />}
+      />
     </ScrollView>
   );
 }
@@ -216,7 +248,7 @@ export default function Account() {
 const styles = StyleSheet.create({
   container: {
     padding: 12,
-    marginBottom:120
+    marginBottom: 120,
   },
   lottie: {
     width: 200,

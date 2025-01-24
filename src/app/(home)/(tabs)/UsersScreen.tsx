@@ -1,3 +1,4 @@
+import LoadingIndicator from "@/src/components/LoadingIndicator";
 import UsersListItem from "@/src/components/UsersList";
 import { supabase } from "@/src/lib/superbase";
 import { useAuth } from "@/src/providers/AuthProvider";
@@ -10,8 +11,7 @@ const UsersScreen = () => {
   const [loading, setLoading] = useState(true); // Loading state
   const { user } = useAuth();
 
-  console.log("users:",users);
-  
+  console.log("users:", users);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -42,22 +42,9 @@ const UsersScreen = () => {
     return <UsersListItem userItem={item} />;
   };
 
-  const LoadingIndicator = () => {
-    return (
-      <AnimatedLoader
-        source={require("../../../../assets/animations/loading.json")}
-        visible={loading}
-        overlayColor="rgba(255,255,255,0.4)"
-        animationStyle={styles.lottie}
-        speed={2}
-        loop={true}
-      />
-    );
-  };
-
   return (
     <View style={{ flex: 1, padding: 16 }}>
-      {LoadingIndicator()}
+      <LoadingIndicator loading={loading} />
       {users.length > 0 ? (
         <FlatList
           data={users}
@@ -77,5 +64,5 @@ const styles = StyleSheet.create({
     height: 100,
     color: "#008000",
   },
-})
+});
 export default UsersScreen;

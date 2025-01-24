@@ -43,10 +43,11 @@ const UsersListItem = ({ userItem }) => {
     try {
       const channel = client.channel("messaging", {
         members: [loggedInUser?.id, userItem?.id],
+        name:userItem.full_name
       });
 
       await channel.watch();
-      router.replace(`/(home)/channel/${channel?.cid}`);
+      router.push(`/(home)/channel/${channel?.cid}`);
     } catch (error) {
       console.error("Error starting chat:", error.message);
       Alert.alert("Error", "Failed to start the chat. Please try again later.");

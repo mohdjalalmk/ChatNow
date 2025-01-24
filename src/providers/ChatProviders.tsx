@@ -6,6 +6,7 @@ import { Chat, OverlayProvider } from "stream-chat-expo";
 import { useAuth } from "./AuthProvider";
 import { supabase } from "../lib/superbase";
 import { tokenProvider } from "../utlis/TokenProvider";
+import LoadingIndicator from "../components/LoadingIndicator";
 
 const client = StreamChat.getInstance(process.env.EXPO_PUBLIC_STREAM_API_KEY);
 
@@ -57,7 +58,7 @@ export const ChatProvider = ({ children }: PropsWithChildren) => {
   }, [profile?.id]);
 
   if (!ready) {
-    return <ActivityIndicator />;
+    return <LoadingIndicator loading={true} />
   }
 
   return (
