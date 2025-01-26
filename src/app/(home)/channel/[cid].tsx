@@ -15,12 +15,14 @@ import { View, Image, Text } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import Entypo from "@expo/vector-icons/Entypo";
 import LoadingIndicator from "@/src/components/LoadingIndicator";
+import { useAuth } from "@/src/providers/AuthProvider";
 
 const ChannelScreen = () => {
   const [channel, setChannel] = useState<ChannelType | null>(null);
   const { cid } = useLocalSearchParams<{ cid: string }>();
   const [name, setName] = useState("");
   const [imageUrl, setImageUrl] = useState(null);
+  const {session} = useAuth()
 
   console.log("channel:", channel);
 
@@ -40,17 +42,24 @@ const ChannelScreen = () => {
   useEffect(() => {
     const getName = () => {
       const members = Object.values(channel?.state?.members);
-      console.log("new:", members[0]);
-      setName(members[0].user?.name);
-      setImageUrl(members[0].user.image);
-      console.log("new imageUrl:", members[0].user.image); // Debugging imageUrl
-
-      console.log("new name:", members[0].user?.name);
+  
+      // Find the member that is not the current user
+      const otherMember = members.find(
+        (member) => member.user?.id !== session?.user.id // Replace `currentUser.id` with the actual variable for the current user's ID
+      );
+  
+      // If a valid other member exists, set the name and image
+      if (otherMember) {
+        setName(otherMember.user?.name);
+        setImageUrl(otherMember.user?.image);
+      }
     };
+  
     if (channel) {
       getName();
     }
-  }, [channel?.state]);
+  }, [channel?.state, session?.user.id]); // Add `currentUser.id` to the dependency array
+  
 
   const startACall = async () => {
     // create a call using channel members
@@ -67,7 +76,6 @@ const ChannelScreen = () => {
 
     console.log("Mapped members:", members);
 
-    console.log("members:", members);
 
     const call = videoClient.call("default", UUID);
 
@@ -77,10 +85,6 @@ const ChannelScreen = () => {
         members,
       },
     });
-    // await call.join()
-    // await call.getOrCreate();
-    // navigate to the call screen
-    // router.push(`/call`);
   };
 
   if (!channel) {
@@ -157,9 +161,9 @@ const ChannelScreen = () => {
         }}
       />
       <MessageList EmptyStateIndicator={EmptyStateIndicator} />
-      <SafeAreaView edges={["bottom"]}>
+      {/* <SafeAreaView edges={["bottom"]}> */}
         <MessageInput />
-      </SafeAreaView>
+      {/* </SafeAreaView> */}
     </Channel>
   );
 };
@@ -188,13 +192,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   logo: {
-    width: 100, // Adjust the width as needed
-    height: 100, // Adjust the height as needed
+    width: 100,
+    height: 100, 
     marginBottom: 20,
   },
   message: {
     fontSize: 16,
-    color: "#888", // Adjust the color to match your design
+    color: "#888", 
     textAlign: "center",
   },
 });
