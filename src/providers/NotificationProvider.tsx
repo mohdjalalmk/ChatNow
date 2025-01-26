@@ -13,7 +13,6 @@ export default function NotificationsProvider({ children }: PropsWithChildren) {
   const requestPermission = async () => {
     try {
       const settings = await notifee.requestPermission();
-      console.log("Settings:", settings);
 
       // Check if notification permissions are granted
       if (settings.authorizationStatus === AuthorizationStatus.AUTHORIZED) {
@@ -37,8 +36,6 @@ export default function NotificationsProvider({ children }: PropsWithChildren) {
   const registerPushToken = async () => {
     try {
       const token = await messaging().getToken();
-      console.log("FCM Token:", token);
-      console.log("User ID:", user.id);
 
       const push_provider = "firebase";
       const push_provider_name = "Firebase"; // optional alias for your push provider

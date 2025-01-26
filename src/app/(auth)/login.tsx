@@ -1,96 +1,206 @@
-import React, { useState } from 'react'
-import { Alert, StyleSheet, View, AppState } from 'react-native'
-import { Button, Input } from '@rneui/themed'
-import { supabase } from '@/src/lib/superbase'
+import React, { useState, useEffect } from "react";
+import {
+  Alert,
+  StyleSheet,
+  View,
+  AppState,
+  AppStateStatus,
+  ImageBackground,
+} from "react-native";
+import { Button, Input } from "@rneui/themed";
+import { supabase } from "@/src/lib/superbase";
+import { LinearGradient } from "expo-linear-gradient";
 
-// Tells Supabase Auth to continuously refresh the session automatically if
-// the app is in the foreground. When this is added, you will continue to receive
-// `onAuthStateChange` events with the `TOKEN_REFRESHED` or `SIGNED_OUT` event
-// if the user's session is terminated. This should only be registered once.
+type InputFieldProps = {
+  label: string;
+  icon: string;
+  value: string;
+  placeholder: string;
+  onChangeText: (text: string) => void;
+  secureTextEntry?: boolean;
+};
+
+const InputField: React.FC<InputFieldProps> = ({
+  label,
+  icon,
+  value,
+  placeholder,
+  onChangeText,
+  secureTextEntry,
+}) => (
+  <View style={styles.verticallySpaced}>
+    <Input
+      label={label}
+      leftIcon={{ type: "font-awesome", name: icon, color: "#000" }}
+      value={value}
+      placeholder={placeholder}
+      onChangeText={onChangeText}
+      secureTextEntry={secureTextEntry}
+      autoCapitalize="none"
+      inputContainerStyle={styles.inputContainer}
+      inputStyle={styles.inputText}
+      labelStyle={styles.inputLabel}
+    />
+  </View>
+);
+
+type GradientButtonProps = {
+  title: string;
+  loading: boolean;
+  onPress: () => void;
+  colors: string[];
+};
 AppState.addEventListener('change', (state) => {
   if (state === 'active') {
-    supabase.auth.startAutoRefresh()
+    supabase.auth.startAutoRefresh();
   } else {
-    supabase.auth.stopAutoRefresh()
+    supabase.auth.stopAutoRefresh();
   }
-})
+});
+
+const GradientButton: React.FC<GradientButtonProps> = ({
+  title,
+  loading,
+  onPress,
+  colors,
+}) => (
+  <View style={styles.verticallySpaced}>
+    <LinearGradient
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      colors={colors}
+      style={styles.buttonStyle}
+    >
+      <Button
+        title={title}
+        disabled={loading}
+        onPress={onPress}
+        buttonStyle={styles.transparentButton}
+        containerStyle={styles.buttonContainer}
+        titleStyle={styles.buttonTitle}
+        disabledStyle={styles.transparentButton}
+      />
+    </LinearGradient>
+  </View>
+);
 
 export default function Auth() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
 
-  async function signInWithEmail() {
-    setLoading(true)
+  const handleSignIn = async () => {
+    setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({
-      email: email,
-      password: password,
-    })
+      email,
+      password,
+    });
+    if (error) Alert.alert("Error", error.message);
+    setLoading(false);
+  };
 
-    if (error) Alert.alert(error.message)
-    setLoading(false)
-  }
-
-  async function signUpWithEmail() {
-    setLoading(true)
-    const {
-      data: { session },
-      error,
-    } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-    })
-console.log("session:",session);
-
-    if (error) Alert.alert(error.message)
-    if (!session) Alert.alert('Please check your inbox for email verification!')
-    setLoading(false)
-  }
+  const handleSignUp = async () => {
+    setLoading(true);
+    const { data, error } = await supabase.auth.signUp({ email, password });
+    if (error) Alert.alert("Error", error.message);
+    if (!data?.session) Alert.alert("Check your inbox for email verification!");
+    setLoading(false);
+  };
 
   return (
-    <View style={styles.container}>
-      <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Input
+    <ImageBackground
+      source={require("../../../assets/images/background.avif")}
+      style={styles.background}
+    >
+      <View style={styles.container}>
+        <InputField
           label="Email"
-          leftIcon={{ type: 'font-awesome', name: 'envelope' }}
-          onChangeText={(text) => setEmail(text)}
+          icon="envelope"
           value={email}
           placeholder="email@address.com"
-          autoCapitalize={'none'}
+          onChangeText={setEmail}
         />
-      </View>
-      <View style={styles.verticallySpaced}>
-        <Input
+        <InputField
           label="Password"
-          leftIcon={{ type: 'font-awesome', name: 'lock' }}
-          onChangeText={(text) => setPassword(text)}
+          icon="lock"
           value={password}
-          secureTextEntry={true}
           placeholder="Password"
-          autoCapitalize={'none'}
+          onChangeText={setPassword}
+          secureTextEntry
+        />
+        <GradientButton
+          title="Sign In"
+          loading={loading}
+          onPress={handleSignIn}
+          colors={["#6CB4EE", "#002244"]}
+        />
+        <GradientButton
+          title="Sign Up"
+          loading={loading}
+          onPress={handleSignUp}
+          colors={["#002244", "#6CB4EE"]}
         />
       </View>
-      <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Button title="Sign in" disabled={loading} onPress={() => signInWithEmail()} />
-      </View>
-      <View style={styles.verticallySpaced}>
-        <Button title="Sign up" disabled={loading} onPress={() => signUpWithEmail()} />
-      </View>
-    </View>
-  )
+    </ImageBackground>
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 40,
+    flex: 1,
+    justifyContent: "center",
     padding: 12,
   },
   verticallySpaced: {
-    paddingTop: 4,
-    paddingBottom: 4,
-    alignSelf: 'stretch',
+    marginVertical: 10,
+    alignSelf: "stretch",
   },
-  mt20: {
-    marginTop: 20,
+  background: {
+    flex: 1,
+    resizeMode: "cover",
+    justifyContent: "center",
   },
-})
+  inputContainer: {
+    borderWidth: 1,
+    borderColor: "#008000",
+    borderRadius: 10,
+    backgroundColor: "#fff",
+    paddingHorizontal: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 2,
+  },
+  inputText: {
+    fontSize: 16,
+    color: "#333",
+  },
+  inputLabel: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#002244",
+    marginBottom: 5,
+    marginLeft: 5,
+  },
+  buttonStyle: {
+    borderRadius: 25,
+    paddingVertical: 6,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  transparentButton: {
+    backgroundColor: "transparent",
+  },
+  buttonContainer: {
+    borderRadius: 25,
+  },
+  buttonTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#fff",
+  },
+});

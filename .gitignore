@@ -41,3 +41,4 @@ app-example
 .env
 ios
 android
+/supabase

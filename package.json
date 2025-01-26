@@ -40,8 +40,10 @@
     "expo-haptics": "~14.0.0",
     "expo-image-manipulator": "~13.0.5",
     "expo-image-picker": "~16.0.3",
+    "expo-linear-gradient": "~14.0.2",
     "expo-linking": "~7.0.3",
     "expo-media-library": "~17.0.5",
+    "expo-notifications": "~0.29.12",
     "expo-router": "~4.0.15",
     "expo-sharing": "~13.0.0",
     "expo-splash-screen": "~0.29.18",
@@ -49,9 +51,11 @@
     "expo-symbols": "~0.2.0",
     "expo-system-ui": "~4.0.6",
     "expo-web-browser": "~14.0.1",
+    "lottie-react-native": "7.1.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-native": "0.76.5",
+    "react-native-animated-loader": "^1.0.0",
     "react-native-callkeep": "^4.3.16",
     "react-native-gesture-handler": "~2.20.2",
     "react-native-incall-manager": "^4.2.0",
@@ -62,8 +66,7 @@
     "react-native-voip-push-notification": "^3.3.2",
     "react-native-web": "~0.19.13",
     "react-native-webview": "13.12.5",
-    "stream-chat-expo": "^6.1.0",
-    "expo-notifications": "~0.29.12"
+    "stream-chat-expo": "^6.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

@@ -40,12 +40,12 @@ import { tokenProvider } from "./TokenProvider";
       // add the async callback to create a video client
       // for incoming calls in the background on a push notification
       createStreamVideoClient: async () => {
-        // note that since the method is async,
-        // you can call your server to get the user data or token or retrieve from offline storage.
+
+        //TODO: update user id 
         const userId = "9312e23c-3564-4056-926e-43c777ed30b7";
         const userName = await AsyncStorage.getItem("@userName");
         if (!userId) return undefined;
-        // an example promise to fetch token from your server
+
 const user = {
     id:"9312e23c-3564-4056-926e-43c777ed30b7"
 }
@@ -55,6 +55,7 @@ console.log("token:",await tokenProvider());
         return StreamVideoClient.getOrCreateInstance({
           apiKey: process?.env?.EXPO_PUBLIC_STREAM_API_KEY, // pass your stream api key
           user,
+          //TODO: Update token  
           token:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiOTMxMmUyM2MtMzU2NC00MDU2LTkyNmUtNDNjNzc3ZWQzMGI3In0.XwC3YhMCXAic3Q7EDDeKkW_bnqAan04jsOAsrBH5cps",
         });
       },

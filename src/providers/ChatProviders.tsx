@@ -6,6 +6,7 @@ import { Chat, OverlayProvider } from "stream-chat-expo";
 import { useAuth } from "./AuthProvider";
 import { supabase } from "../lib/superbase";
 import { tokenProvider } from "../utlis/TokenProvider";
+import LoadingIndicator from "../components/LoadingIndicator";
 
 const client = StreamChat.getInstance(process.env.EXPO_PUBLIC_STREAM_API_KEY);
 
@@ -17,11 +18,10 @@ export const ChatProvider = ({ children }: PropsWithChildren) => {
       return;
     }
     const connect = async () => {
-  
       try {
-        const { data } = supabase.storage.from('avatars').getPublicUrl(profile.avatar_url)
-
-// console.log(data.publicUrl)
+        const { data } = supabase.storage
+          .from("avatars")
+          .getPublicUrl(profile.avatar_url);
 
         const resp = await client.connectUser(
           {
@@ -34,16 +34,7 @@ export const ChatProvider = ({ children }: PropsWithChildren) => {
         setIsReady(true);
       } catch (error) {
         // setIsReady(false)
-        console.log("error in connect user:", error);
       }
-
-      /**
-       *  Channel created using a channel id
-       */
-      // const channel = client.channel("messaging", "the_park", {
-      //   name: "The Park",
-      // });
-      // channel.watch();
     };
 
     connect();
@@ -57,7 +48,7 @@ export const ChatProvider = ({ children }: PropsWithChildren) => {
   }, [profile?.id]);
 
   if (!ready) {
-    return <ActivityIndicator />;
+    return <LoadingIndicator loading={true} />;
   }
 
   return (
