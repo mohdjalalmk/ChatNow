@@ -21,61 +21,45 @@ const ChannelScreen = () => {
   const [channel, setChannel] = useState<ChannelType | null>(null);
   const { cid } = useLocalSearchParams<{ cid: string }>();
   const [name, setName] = useState("");
-  const [imageUrl, setImageUrl] = useState(null);
-  const {session} = useAuth()
-
-  console.log("channel:", channel);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const { session } = useAuth();
 
   const { client } = useChatContext();
   const videoClient = useStreamVideoClient();
 
   const fetchChannel = async () => {
     const channel = await client.queryChannels({ cid });
-
     setChannel(channel[0]);
   };
 
   useEffect(() => {
     fetchChannel();
-  }, []);
+  }, [cid, client]);
 
   useEffect(() => {
     const getName = () => {
       const members = Object.values(channel?.state?.members);
-  
-      // Find the member that is not the current user
+
       const otherMember = members.find(
-        (member) => member.user?.id !== session?.user.id // Replace `currentUser.id` with the actual variable for the current user's ID
+        (member) => member.user?.id !== session?.user.id
       );
-  
-      // If a valid other member exists, set the name and image
+
       if (otherMember) {
-        setName(otherMember.user?.name);
-        setImageUrl(otherMember.user?.image);
+        setName(otherMember.user?.name || "");
+        setImageUrl(otherMember.user?.image || null);
       }
     };
-  
+
     if (channel) {
       getName();
     }
-  }, [channel?.state, session?.user.id]); // Add `currentUser.id` to the dependency array
-  
+  }, [channel, session?.user.id]);
 
   const startACall = async () => {
-    // create a call using channel members
     const UUID = Crypto.randomUUID();
-    const members = Object.values(channel?.state?.members).map((member) => {
-      // Log the member object for debugging
-      console.log("Mapping member:", member);
-
-      // Return the transformed object
-      return {
-        user_id: member.user_id,
-      };
-    });
-
-    console.log("Mapped members:", members);
-
+    const members = Object.values(channel?.state?.members).map((member) => ({
+      user_id: member.user_id,
+    }));
 
     const call = videoClient.call("default", UUID);
 
@@ -90,11 +74,12 @@ const ChannelScreen = () => {
   if (!channel) {
     return <LoadingIndicator loading={!channel} />;
   }
+
   const UserAvatar = () => {
     return (
       <Image
         source={
-          imageUrl && !imageUrl.includes("null") && imageUrl.trim() !== ""
+          imageUrl && imageUrl.trim() !== "" && !imageUrl.includes("null")
             ? { uri: imageUrl }
             : require("../../../../assets/images/user-placeholder.jpg")
         }
@@ -107,48 +92,39 @@ const ChannelScreen = () => {
     return (
       <View style={styles.container}>
         <Entypo name="chat" size={40} color="#002244" />
-        <Text style={styles.message}>
-          No messages yet. Start a conversation!
-        </Text>
+        <Text style={styles.message}>No messages yet. Start a conversation!</Text>
       </View>
     );
   };
 
   return (
-    <Channel
-      audioRecordingEnabled={true}
-      channel={channel}
-    >
+    <Channel audioRecordingEnabled={true} channel={channel}>
       <Stack.Screen
         options={{
-          // title: name,
-          // headerTitle: name,
           title: "",
           headerLeft: () => {
             return (
-              <>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    marginBottom: 5,
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginBottom: 5,
+                }}
+              >
+                <Ionicons
+                  onPress={() => {
+                    if (router.canGoBack()) {
+                      router.back();
+                    }
                   }}
-                >
-                  <Ionicons
-                    onPress={() => {
-                      if (router.canGoBack()) {
-                        router.back();
-                      }
-                    }}
-                    name="arrow-back-outline"
-                    size={24}
-                    color="black"
-                  />
-                  <UserAvatar />
-                  <Text style={{ fontWeight: "700" }}> {name} </Text>
-                </View>
-              </>
+                  name="arrow-back-outline"
+                  size={24}
+                  color="black"
+                />
+                <UserAvatar />
+                <Text style={{ fontWeight: "700" }}>{name}</Text>
+              </View>
             );
           },
           headerRight: () => {
@@ -161,9 +137,9 @@ const ChannelScreen = () => {
         }}
       />
       <MessageList EmptyStateIndicator={EmptyStateIndicator} />
-      {/* <SafeAreaView edges={["bottom"]}> */}
+      <SafeAreaView edges={["bottom"]}>
         <MessageInput />
-      {/* </SafeAreaView> */}
+      </SafeAreaView>
     </Channel>
   );
 };
@@ -176,29 +152,14 @@ const styles = StyleSheet.create({
     marginRight: 10,
     marginHorizontal: 5,
   },
-  placeholder: {
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#ccc",
-  },
-  placeholderText: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#666",
-  },
   container: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
   },
-  logo: {
-    width: 100,
-    height: 100, 
-    marginBottom: 20,
-  },
   message: {
     fontSize: 16,
-    color: "#888", 
+    color: "#888",
     textAlign: "center",
   },
 });

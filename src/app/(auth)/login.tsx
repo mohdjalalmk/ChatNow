@@ -1,49 +1,111 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Alert,
   StyleSheet,
   View,
   AppState,
+  AppStateStatus,
   ImageBackground,
 } from "react-native";
 import { Button, Input } from "@rneui/themed";
 import { supabase } from "@/src/lib/superbase";
-import { LinearGradient } from "expo-linear-gradient"; // Import LinearGradient
+import { LinearGradient } from "expo-linear-gradient";
 
-AppState.addEventListener("change", (state) => {
-  if (state === "active") {
+type InputFieldProps = {
+  label: string;
+  icon: string;
+  value: string;
+  placeholder: string;
+  onChangeText: (text: string) => void;
+  secureTextEntry?: boolean;
+};
+
+const InputField: React.FC<InputFieldProps> = ({
+  label,
+  icon,
+  value,
+  placeholder,
+  onChangeText,
+  secureTextEntry,
+}) => (
+  <View style={styles.verticallySpaced}>
+    <Input
+      label={label}
+      leftIcon={{ type: "font-awesome", name: icon, color: "#000" }}
+      value={value}
+      placeholder={placeholder}
+      onChangeText={onChangeText}
+      secureTextEntry={secureTextEntry}
+      autoCapitalize="none"
+      inputContainerStyle={styles.inputContainer}
+      inputStyle={styles.inputText}
+      labelStyle={styles.inputLabel}
+    />
+  </View>
+);
+
+type GradientButtonProps = {
+  title: string;
+  loading: boolean;
+  onPress: () => void;
+  colors: string[];
+};
+AppState.addEventListener('change', (state) => {
+  if (state === 'active') {
     supabase.auth.startAutoRefresh();
   } else {
     supabase.auth.stopAutoRefresh();
   }
 });
 
-export default function Auth() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+const GradientButton: React.FC<GradientButtonProps> = ({
+  title,
+  loading,
+  onPress,
+  colors,
+}) => (
+  <View style={styles.verticallySpaced}>
+    <LinearGradient
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      colors={colors}
+      style={styles.buttonStyle}
+    >
+      <Button
+        title={title}
+        disabled={loading}
+        onPress={onPress}
+        buttonStyle={styles.transparentButton}
+        containerStyle={styles.buttonContainer}
+        titleStyle={styles.buttonTitle}
+        disabledStyle={styles.transparentButton}
+      />
+    </LinearGradient>
+  </View>
+);
 
-  async function signInWithEmail() {
+export default function Auth() {
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const handleSignIn = async () => {
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({
-      email: email,
-      password: password,
+      email,
+      password,
     });
-    if (error) Alert.alert(error.message);
+    if (error) Alert.alert("Error", error.message);
     setLoading(false);
-  }
+  };
 
-  async function signUpWithEmail() {
+  const handleSignUp = async () => {
     setLoading(true);
-    const { data, error } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-    });
-    if (error) Alert.alert(error.message);
-    if (!data?.session)
-      Alert.alert("Please check your inbox for email verification!");
+    const { data, error } = await supabase.auth.signUp({ email, password });
+    if (error) Alert.alert("Error", error.message);
+    if (!data?.session) Alert.alert("Check your inbox for email verification!");
     setLoading(false);
-  }
+  };
 
   return (
     <ImageBackground
@@ -51,69 +113,33 @@ export default function Auth() {
       style={styles.background}
     >
       <View style={styles.container}>
-        <View style={[styles.verticallySpaced, styles.mt20]}>
-          <Input
-            label="Email"
-            leftIcon={{ type: "font-awesome", name: "envelope", color: "#000" }}
-            onChangeText={(text) => setEmail(text)}
-            value={email}
-            placeholder="email@address.com"
-            autoCapitalize={"none"}
-            inputContainerStyle={styles.inputContainer}
-            inputStyle={styles.inputText}
-            labelStyle={styles.inputLabel}
-          />
-        </View>
-        <View style={styles.verticallySpaced}>
-          <Input
-            label="Password"
-            leftIcon={{ type: "font-awesome", name: "lock", color: "#000" }}
-            onChangeText={(text) => setPassword(text)}
-            value={password}
-            secureTextEntry={true}
-            placeholder="Password"
-            autoCapitalize={"none"}
-            inputContainerStyle={styles.inputContainer}
-            inputStyle={styles.inputText}
-            labelStyle={styles.inputLabel}
-          />
-        </View>
-        <View style={[styles.verticallySpaced, styles.mt20]}>
-          <LinearGradient
-            colors={["#6CB4EE", "#002244"]}
-            start={{ x: 0, y: 0 }} // Top-left corner
-            end={{ x: 1, y: 1 }} // Bottom-right corner
-            style={[styles.buttonStyle, { paddingVertical: 8 }]}
-          >
-            <Button
-              title="Sign in"
-              disabled={loading}
-              onPress={() => signInWithEmail()}
-              buttonStyle={{ backgroundColor: "transparent" }} // Transparent background
-              containerStyle={{ borderRadius: 25 }}
-              titleStyle={styles.buttonTitle}
-              disabledStyle={{ backgroundColor: "transparent" }}
-            />
-          </LinearGradient>
-        </View>
-        <View style={styles.verticallySpaced}>
-          <LinearGradient
-            colors={["#002244", "#6CB4EE"]}
-            start={{ x: 0, y: 0 }} // Top-left corner
-            end={{ x: 1, y: 1 }} // Bottom-right corner
-            style={[styles.buttonStyle, { paddingVertical: 8 }]}
-          >
-            <Button
-              title="Sign up"
-              disabled={loading}
-              onPress={() => signUpWithEmail()}
-              buttonStyle={{ backgroundColor: "transparent" }} // Transparent background
-              containerStyle={{ borderRadius: 25 }}
-              titleStyle={styles.buttonTitle}
-              disabledStyle={{ backgroundColor: "transparent" }}
-            />
-          </LinearGradient>
-        </View>
+        <InputField
+          label="Email"
+          icon="envelope"
+          value={email}
+          placeholder="email@address.com"
+          onChangeText={setEmail}
+        />
+        <InputField
+          label="Password"
+          icon="lock"
+          value={password}
+          placeholder="Password"
+          onChangeText={setPassword}
+          secureTextEntry
+        />
+        <GradientButton
+          title="Sign In"
+          loading={loading}
+          onPress={handleSignIn}
+          colors={["#6CB4EE", "#002244"]}
+        />
+        <GradientButton
+          title="Sign Up"
+          loading={loading}
+          onPress={handleSignUp}
+          colors={["#002244", "#6CB4EE"]}
+        />
       </View>
     </ImageBackground>
   );
@@ -126,12 +152,8 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   verticallySpaced: {
-    paddingTop: 10,
-    paddingBottom: 10,
+    marginVertical: 10,
     alignSelf: "stretch",
-  },
-  mt20: {
-    marginTop: 20,
   },
   background: {
     flex: 1,
@@ -157,7 +179,7 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 14,
     fontWeight: "bold",
-    color: "002244",
+    color: "#002244",
     marginBottom: 5,
     marginLeft: 5,
   },
@@ -170,8 +192,11 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 5,
   },
-  buttonInner: {
-    borderRadius: 25, // Keep inner button rounded
+  transparentButton: {
+    backgroundColor: "transparent",
+  },
+  buttonContainer: {
+    borderRadius: 25,
   },
   buttonTitle: {
     fontSize: 16,

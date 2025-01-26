@@ -16,26 +16,19 @@ const UsersListItem = ({ userItem }) => {
     }
   }, [userItem?.avatar_url]);
 
-  const downloadImage = async (path) => {
-    console.log("started");
-    
+  const downloadImage = async (path: string) => {
     try {
       const { data, error } = await supabase.storage.from("avatars").download(path);
 
       if (error) {
-        console.error("Error downloading avatar:", error.message);
         throw error;
       }
 
       const fr = new FileReader();
       fr.readAsDataURL(data);
-      fr.onload = () => {
-        setAvatarUrl(fr.result as string);
-        console.log("setting...");
-        
-      };
+      fr.onload = () => setAvatarUrl(fr.result as string);
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Error downloading avatar:", error.message);
     }
   };
 
@@ -43,13 +36,12 @@ const UsersListItem = ({ userItem }) => {
     try {
       const channel = client.channel("messaging", {
         members: [loggedInUser?.id, userItem?.id],
-        name:userItem.full_name
+        name: userItem.full_name,
       });
 
       await channel.watch();
       router.push(`/(home)/channel/${channel?.cid}`);
     } catch (error) {
-      console.error("Error starting chat:", error.message);
       Alert.alert("Error", "Failed to start the chat. Please try again later.");
     }
   };
@@ -59,10 +51,7 @@ const UsersListItem = ({ userItem }) => {
   return (
     <Pressable style={styles.container} onPress={onStartChat}>
       {avatarUrl ? (
-        <Image
-          source={{ uri: avatarUrl }}
-          style={styles.avatar}
-        />
+        <Image source={{ uri: avatarUrl }} style={styles.avatar} />
       ) : (
         <View style={[styles.avatar, styles.placeholder]}>
           <Text style={styles.placeholderText}>{firstLetter}</Text>

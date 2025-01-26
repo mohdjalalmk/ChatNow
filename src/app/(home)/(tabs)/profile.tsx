@@ -1,14 +1,12 @@
 import { useState, useEffect } from "react";
-import { StyleSheet, View, Alert, ScrollView, Text } from "react-native";
+import { StyleSheet, View, Alert, ScrollView } from "react-native";
 import { Button, Input } from "@rneui/themed";
-import { Session } from "@supabase/supabase-js";
 import { supabase } from "@/src/lib/superbase";
 import { useAuth } from "@/src/providers/AuthProvider";
 import Avatar from "@/src/components/Avatar";
 import { useChatContext } from "stream-chat-expo";
-import { tokenProvider } from "@/src/utlis/TokenProvider";
 import AnimatedLoader from "react-native-animated-loader";
-import AlertBox from "@/src/components/AlerBox";
+import AlertBox from "@/src/components/AlertBox";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 
@@ -22,8 +20,6 @@ export default function Account() {
   const [showSignOutModal, setShowSignOutModal] = useState(false);
   const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
   const { client } = useChatContext();
-  const { profile } = useAuth();
-  const { user } = useAuth();
 
   useEffect(() => {
     if (session) getProfile();
@@ -36,7 +32,7 @@ export default function Account() {
 
       const { data, error, status } = await supabase
         .from("profiles")
-        .select(`username, website, avatar_url,full_name`)
+        .select(`username, website, avatar_url, full_name`)
         .eq("id", session?.user.id)
         .single();
       if (error && status !== 406) {
@@ -58,17 +54,7 @@ export default function Account() {
     }
   }
 
-  async function updateProfile({
-    username,
-    website,
-    avatar_url,
-    full_name,
-  }: {
-    username: string;
-    website: string;
-    avatar_url: string;
-    full_name: string;
-  }) {
+  async function updateProfile({ username, website, avatar_url, full_name }: { username: string; website: string; avatar_url: string; full_name: string }) {
     try {
       setLoading(true);
       if (!session?.user) throw new Error("No user on the session!");
@@ -95,6 +81,7 @@ export default function Account() {
       setLoading(false);
     }
   }
+
   const handleSignOut = async () => {
     await client.disconnectUser();
     supabase.auth.signOut();
@@ -102,25 +89,22 @@ export default function Account() {
   };
 
   const handleDeleteAccount = async () => {
-    if (!user) throw new Error("No user");
     await supabase.functions.invoke("delete-account");
     await client.disconnectUser();
     supabase.auth.signOut();
     setShowDeleteAccountModal(false);
   };
 
-  const LoadingIndicator = () => {
-    return (
-      <AnimatedLoader
-        source={require("../../../../assets/animations/loading.json")}
-        visible={loading}
-        overlayColor="rgba(255,255,255,0.4)"
-        animationStyle={styles.lottie}
-        speed={2}
-        loop={true}
-      />
-    );
-  };
+  const LoadingIndicator = () => (
+    <AnimatedLoader
+      source={require("../../../../assets/animations/loading.json")}
+      visible={loading}
+      overlayColor="rgba(255,255,255,0.4)"
+      animationStyle={styles.lottie}
+      speed={2}
+      loop={true}
+    />
+  );
 
   return (
     <ScrollView style={styles.container}>
@@ -129,17 +113,11 @@ export default function Account() {
           url={avatarUrl}
           onUpload={(url: string) => {
             setAvatarUrl(url);
-            updateProfile({
-              username,
-              website,
-              avatar_url: url,
-              full_name: fullname,
-            });
+            updateProfile({ username, website, avatar_url: url, full_name: fullname });
           }}
         />
       </View>
       <View style={styles.horizontalLine} />
-
       <View style={styles.verticallySpaced}>
         <Input
           label="Email"
@@ -151,13 +129,6 @@ export default function Account() {
           disabledInputStyle={styles.disabledInput}
         />
       </View>
-      {/* <View style={styles.verticallySpaced}>
-        <Input
-          label="Username"
-          value={username || ""}
-          onChangeText={(text) => setUsername(text)}
-        />
-      </View> */}
       {LoadingIndicator()}
       <View style={styles.verticallySpaced}>
         <Input
@@ -171,7 +142,6 @@ export default function Account() {
           placeholderTextColor="#888"
         />
       </View>
-
       <View style={styles.verticallySpaced}>
         <Input
           label="Full Name"
@@ -184,25 +154,16 @@ export default function Account() {
           placeholderTextColor="#888"
         />
       </View>
-
       <View style={styles.verticallySpaced}>
         <Button
           title={loading ? "Loading ..." : "Update"}
-          onPress={() =>
-            updateProfile({
-              username,
-              website,
-              avatar_url: avatarUrl,
-              full_name: fullname,
-            })
-          }
+          onPress={() => updateProfile({ username, website, avatar_url: avatarUrl, full_name: fullname })}
           disabled={loading}
           buttonStyle={styles.updateButton}
           titleStyle={styles.updateButtonText}
           disabledStyle={styles.disabledButton}
         />
       </View>
-
       <View style={styles.verticallySpaced}>
         <Button
           title="Sign Out"
@@ -229,8 +190,6 @@ export default function Account() {
         onCancel={() => setShowSignOutModal(false)}
         logo={<FontAwesome name="sign-out" size={40} color="#002244" />}
       />
-
-      {/* Delete Account Modal */}
       <AlertBox
         visible={showDeleteAccountModal}
         title="Delete Account"
@@ -246,19 +205,9 @@ export default function Account() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 12,
-    marginBottom: 120,
-  },
-  lottie: {
-    width: 200,
-    height: 100,
-    color: "#008000",
-  },
-  verticallySpaced: {
-    paddingBottom: 4,
-    alignSelf: "stretch",
-  },
+  container: { padding: 12, marginBottom: 120 },
+  lottie: { width: 200, height: 100, color: "#008000" },
+  verticallySpaced: { paddingBottom: 4, alignSelf: "stretch" },
   inputContainer: {
     borderWidth: 1,
     borderColor: "#ccc",
@@ -271,21 +220,9 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 2,
   },
-  inputText: {
-    fontSize: 16,
-    color: "#333",
-  },
-  inputLabel: {
-    fontSize: 14,
-    fontWeight: "bold",
-    color: "#555",
-    marginBottom: 10,
-    marginLeft: 5,
-  },
-  disabledInput: {
-    color: "#aaa",
-    backgroundColor: "#eee",
-  },
+  inputText: { fontSize: 16, color: "#333" },
+  inputLabel: { fontSize: 14, fontWeight: "bold", color: "#555", marginBottom: 10, marginLeft: 5 },
+  disabledInput: { color: "#aaa", backgroundColor: "#eee" },
   updateButton: {
     backgroundColor: "#008000",
     borderRadius: 25,
@@ -296,20 +233,9 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 5,
   },
-  updateButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#fff",
-  },
-  disabledButton: {
-    backgroundColor: "#ddd",
-  },
-  horizontalLine: {
-    height: 1, // Thickness of the line
-    backgroundColor: "#ccc", // Line color
-    marginVertical: 15, // Space above and below the line,
-    marginHorizontal: 15,
-  },
+  updateButtonText: { fontSize: 16, fontWeight: "600", color: "#fff" },
+  disabledButton: { backgroundColor: "#ddd" },
+  horizontalLine: { height: 1, backgroundColor: "#ccc", marginVertical: 15, marginHorizontal: 15 },
   signOutButton: {
     backgroundColor: "#002244",
     borderRadius: 25,
@@ -320,11 +246,7 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 5,
   },
-  signOutButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#fff",
-  },
+  signOutButtonText: { fontSize: 16, fontWeight: "600", color: "#fff" },
   deleteButton: {
     backgroundColor: "#dc3545",
     borderRadius: 25,
@@ -335,9 +257,5 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 5,
   },
-  deleteButtonText: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#fff",
-  },
+  deleteButtonText: { fontSize: 16, fontWeight: "700", color: "#fff" },
 });

@@ -32,9 +32,7 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
 
       const fr = new FileReader();
       fr.readAsDataURL(data);
-      fr.onload = () => {
-        setAvatarUrl(fr.result as string);
-      };
+      fr.onload = () => setAvatarUrl(fr.result as string);
     } catch (error) {
       if (error instanceof Error) {
         console.log("Error downloading image: ", error.message);
@@ -47,47 +45,40 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
       setUploading(true);
 
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images, // Restrict to only images
-        allowsMultipleSelection: false, // Can only select one image
-        allowsEditing: true, // Allows the user to crop / rotate their photo before uploading it
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsMultipleSelection: false,
+        allowsEditing: true,
         quality: 1,
         exif: false, // We don't want nor need that data.
       });
 
       if (result.canceled || !result.assets || result.assets.length === 0) {
-        console.log("User cancelled image picker.");
         return;
       }
 
       const image = result.assets[0];
-      console.log("Got image", image);
-
       if (!image.uri) {
-        throw new Error("No image uri!"); // Realistically, this should never happen, but just in case...
+        throw new Error("No image uri!");
       }
 
-      const arraybuffer = await fetch(image.uri).then((res) =>
-        res.arrayBuffer()
-      );
-
-      const fileExt = image.uri?.split(".").pop()?.toLowerCase() ?? "jpeg";
+      const arraybuffer = await fetch(image.uri).then((res) => res.arrayBuffer());
+      const fileExt = image.uri.split(".").pop()?.toLowerCase() ?? "jpeg";
       const path = `${Date.now()}.${fileExt}`;
-      const { data, error: uploadError } = await supabase.storage
+
+      const { data, error } = await supabase.storage
         .from("avatars")
         .upload(path, arraybuffer, {
           contentType: image.mimeType ?? "image/jpeg",
         });
 
-      if (uploadError) {
-        throw uploadError;
+      if (error) {
+        throw error;
       }
 
       onUpload(data.path);
     } catch (error) {
       if (error instanceof Error) {
         Alert.alert(error.message);
-      } else {
-        throw error;
       }
     } finally {
       setUploading(false);
@@ -101,46 +92,16 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
           <Image
             source={{ uri: avatarUrl }}
             accessibilityLabel="Avatar"
-            style={[
-              avatarSize,
-              { borderRadius: size / 2 },
-              styles.avatar,
-              styles.image,
-            ]}
+            style={[avatarSize, { borderRadius: size / 2 }, styles.avatar, styles.image]}
           />
         ) : (
-          <View
-            style={[
-              { borderRadius: 75, height: 150, width: 150 },
-              styles.avatar,
-              styles.noImage,
-            ]}
-          >
-            <MaterialIcons
-              onPress={uploadAvatar}
-              name="add-a-photo"
-              size={36}
-              color="green"
-            />
+          <View style={[{ borderRadius: size / 2 }, styles.avatar, styles.noImage]}>
+            <MaterialIcons onPress={uploadAvatar} name="add-a-photo" size={36} color="green" />
           </View>
         )}
       </View>
-      <Pressable
-        style={{
-          flexDirection: "row",
-          justifyContent: "center",
-          alignItems: "center",
-          marginTop: 15,
-        }}
-        onPress={uploadAvatar}
-      >
-        {/* <Button
-          color={"#002244"}
-          title={"Edit"}
-          onPress={uploadAvatar}
-          disabled={uploading}
-        /> */}
-        <Text style={{ marginRight: 10, color: "002244" }}>Edit</Text>
+      <Pressable style={styles.editButton} onPress={uploadAvatar}>
+        <Text style={styles.editText}>Edit</Text>
         <FontAwesome name="edit" size={24} color="#008000" />
       </Pressable>
     </View>
@@ -154,14 +115,22 @@ const styles = StyleSheet.create({
   },
   image: {
     objectFit: "cover",
-    paddingTop: 0,
   },
   noImage: {
     backgroundColor: "#333",
     borderWidth: 1,
-    borderStyle: "solid",
     borderColor: "rgb(200, 200, 200)",
     justifyContent: "center",
     alignItems: "center",
+  },
+  editButton: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 15,
+  },
+  editText: {
+    marginRight: 10,
+    color: "#002244",
   },
 });

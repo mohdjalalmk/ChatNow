@@ -10,7 +10,6 @@ import { firebaseDataHandler, isFirebaseStreamVideoMessage, isNotifeeStreamVideo
 setPushConfig();
 
 messaging().setBackgroundMessageHandler(async (remoteMessage) => {
-  console.log("remote msg:",remoteMessage);
 
   if (isFirebaseStreamVideoMessage(remoteMessage)) {
     await firebaseDataHandler(remoteMessage.data);
@@ -48,7 +47,6 @@ messaging().setBackgroundMessageHandler(async (remoteMessage) => {
   );
   // handle the message
   const message = await client.getMessage(remoteMessage.data.id);
-  console.log("message :",message);
   
 
   // create the android channel to send the notification to
@@ -56,8 +54,6 @@ messaging().setBackgroundMessageHandler(async (remoteMessage) => {
     id: "chat-messages",
     name: "Chat Messages",
   });
-
-  console.log("channel",channelId);
   
 
   // display the notification
@@ -78,7 +74,5 @@ data,
         id: "default",
       },
     },
-  });
-  console.log("test:",test);
-  
+  });  
 });

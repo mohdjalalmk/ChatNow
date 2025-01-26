@@ -27,7 +27,7 @@ const ModalAlert = ({
   cancelText,
   onConfirm,
   onCancel,
-  logo, // Destructure logo prop
+  logo, 
 }: ModalAlertProps) => {
   return (
     <Modal

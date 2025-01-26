@@ -4,14 +4,19 @@ import { supabase } from "@/src/lib/superbase";
 import { useAuth } from "@/src/providers/AuthProvider";
 import React, { useEffect, useState } from "react";
 import { FlatList, Text, StyleSheet, View } from "react-native";
-import AnimatedLoader from "react-native-animated-loader";
+
+type Profile = {
+  id: string;
+  full_name: string | null;
+  username: string | null;
+  website: string | null;
+  avatar_url: string | null;
+};
 
 const UsersScreen = () => {
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true); // Loading state
+  const [users, setUsers] = useState<Profile[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const { user } = useAuth();
-
-  console.log("users:", users);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -31,14 +36,14 @@ const UsersScreen = () => {
       } catch (err) {
         console.error("Unexpected error:", err);
       } finally {
-        setLoading(false); // Ensure loading ends regardless of success or failure
+        setLoading(false);
       }
     };
 
     fetchUsers();
   }, [user?.id]);
 
-  const renderUserList = ({ item }) => {
+  const renderUserList = ({ item }: { item: Profile }) => {
     return <UsersListItem userItem={item} />;
   };
 
@@ -58,11 +63,4 @@ const UsersScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  lottie: {
-    width: 200,
-    height: 100,
-    color: "#008000",
-  },
-});
 export default UsersScreen;
